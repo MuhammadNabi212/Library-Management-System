@@ -3,7 +3,6 @@ import json
 from datetime import datetime
 from typing import List, Dict, Optional
 from collections import defaultdict
-import matplotlib.pyplot as plt
 
 class Book:
     def __init__(self, title: str, author: str, genre: str, book_id: str):
@@ -131,60 +130,6 @@ class Library:
         # Return top 5 recommendations sorted by score
         return [book for _, book in sorted(recommendations, reverse=True)[:5]]
 
-    def generate_statistics(self) -> Dict:
-        """Generate library statistics for visualization."""
-        stats = {
-            'genres': defaultdict(int),
-            'authors': defaultdict(int),
-            'ratings': defaultdict(list),
-            'borrow_frequency': defaultdict(int)
-        }
-        
-        for book in self.books:
-            stats['genres'][book.genre] += 1
-            stats['authors'][book.author] += 1
-            if book.num_ratings > 0:
-                stats['ratings'][book.genre].append(book.rating)
-            stats['borrow_frequency'][book.title] = len(book.borrow_history)
-        
-        return stats
-
-    def visualize_statistics(self) -> None:
-        """Create visualizations of library statistics."""
-        stats = self.generate_statistics()
-        
-        # Create a figure with subplots
-        plt.figure(figsize=(15, 10))
-        
-        # Genre distribution
-        plt.subplot(2, 2, 1)
-        genres = list(stats['genres'].keys())
-        counts = list(stats['genres'].values())
-        plt.bar(genres, counts)
-        plt.title('Books by Genre')
-        plt.xticks(rotation=45)
-        
-        # Average ratings by genre
-        plt.subplot(2, 2, 2)
-        avg_ratings = {genre: sum(ratings)/len(ratings) 
-                      for genre, ratings in stats['ratings'].items() 
-                      if ratings}
-        if avg_ratings:
-            plt.bar(avg_ratings.keys(), avg_ratings.values())
-            plt.title('Average Ratings by Genre')
-            plt.xticks(rotation=45)
-        
-        # Most borrowed books
-        plt.subplot(2, 2, 3)
-        sorted_books = sorted(stats['borrow_frequency'].items(), 
-                            key=lambda x: x[1], reverse=True)[:5]
-        plt.bar([b[0] for b in sorted_books], [b[1] for b in sorted_books])
-        plt.title('Most Borrowed Books')
-        plt.xticks(rotation=45)
-        
-        plt.tight_layout()
-        plt.show()
-
     def save_books(self) -> None:
         """Save library data to JSON file with error handling."""
         try:
@@ -224,8 +169,7 @@ def main():
         print("5. View All Books")
         print("6. Rate a Book")
         print("7. Get Book Recommendations")
-        print("8. View Library Statistics")
-        print("9. Change User")
+        print("8. Change User")
         print("0. Exit")
         print("==============================")
 
@@ -235,7 +179,7 @@ def main():
     while True:
         try:
             print_menu()
-            choice = input("Enter choice (0-9): ")
+            choice = input("Enter choice (0-8): ")
 
             if choice == '1':
                 title = input("Enter book title: ")
@@ -335,9 +279,6 @@ def main():
                     print("No recommendations available yet. Try borrowing and rating some books first!")
 
             elif choice == '8':
-                library.visualize_statistics()
-
-            elif choice == '9':
                 login()
 
             elif choice == '0':
